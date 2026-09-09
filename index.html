@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111827">
+<link rel="manifest" href="manifest.json">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Expense Tracker</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:#f3f4f6;color:#111827}
+.app{max-width:760px;margin:auto;min-height:100vh;padding-bottom:84px}.top{background:#111827;color:white;padding:22px 18px 18px;border-radius:0 0 22px 22px}
+.top h1{margin:0;font-size:24px}.top p{margin:5px 0 0;color:#cbd5e1;font-size:13px}
+.controls{display:flex;gap:8px;margin-top:16px}.controls select{flex:1;background:#1f2937;color:white;border:1px solid #374151;border-radius:10px;padding:10px}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:14px}.card{background:white;border-radius:16px;padding:15px;box-shadow:0 2px 10px #0000000a}.label{font-size:12px;color:#6b7280}.value{font-size:21px;font-weight:750;margin-top:5px}.income{color:#15803d}.expense{color:#dc2626}.balance{color:#2563eb}
+.section{padding:0 14px 14px}.section h2{font-size:17px;margin:8px 2px 10px}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}.btn{border:0;border-radius:13px;padding:13px;font-weight:700;font-size:14px;cursor:pointer}.primary{background:#111827;color:white}.secondary{background:white;color:#111827;border:1px solid #e5e7eb}
+.list{display:flex;flex-direction:column;gap:8px}.item{background:white;border-radius:13px;padding:12px;display:flex;align-items:center;justify-content:space-between}.item .desc{font-weight:650}.item small{display:block;color:#6b7280;margin-top:3px}.amount{font-weight:750}.amount.exp{color:#dc2626}.amount.inc{color:#15803d}
+.bars{background:white;border-radius:16px;padding:15px}.barrow{margin:11px 0}.barhead{display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px}.track{height:9px;background:#e5e7eb;border-radius:9px;overflow:hidden}.fill{height:100%;background:#111827;border-radius:9px}
+.empty{text-align:center;color:#6b7280;padding:25px}
+nav{position:fixed;bottom:0;left:0;right:0;background:white;border-top:1px solid #e5e7eb;display:flex;justify-content:center;z-index:5}.navin{max-width:760px;width:100%;display:grid;grid-template-columns:repeat(3,1fr)}nav button{background:none;border:0;padding:13px 5px;color:#6b7280;font-weight:650}nav button.active{color:#111827}
+.modal{display:none;position:fixed;inset:0;background:#0008;z-index:10;align-items:flex-end}.modal.show{display:flex}.sheet{background:#f9fafb;width:100%;max-width:760px;margin:auto;border-radius:22px 22px 0 0;padding:18px;max-height:92vh;overflow:auto}.sheet h2{margin:0 0 14px}
+form{display:grid;gap:10px}input,select{width:100%;padding:12px;border:1px solid #d1d5db;border-radius:11px;background:white;font-size:15px}label{font-size:12px;font-weight:650;color:#374151}.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.close{float:right;border:0;background:#e5e7eb;border-radius:50%;width:32px;height:32px}
+.progress{height:10px;background:#e5e7eb;border-radius:10px;overflow:hidden}.progress div{height:100%;background:#111827}.muted{color:#6b7280;font-size:12px}.danger{color:#b91c1c}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top">
+<h1>Expense Tracker</h1><p>Your personal money dashboard</p>
+<div class="controls"><select id="month"></select><button class="btn secondary" onclick="openBudget()">Budget</button></div>
+</header>
+<main id="content"></main>
+</div>
+<nav><div class="navin"><button class="active" onclick="showTab('dashboard',this)">🏠<br>Dashboard</button><button onclick="showTab('transactions',this)">📋<br>Transactions</button><button onclick="showTab('settings',this)">⚙️<br>Settings</button></div></nav>
+
+<div class="modal" id="modal"><div class="sheet">
+<button class="close" onclick="closeModal()">×</button><h2 id="modalTitle">Add Expense</h2>
+<form id="form">
+<input type="hidden" id="type">
+<label>Amount (₹)<input id="amount" type="number" min="0" step="0.01" required></label>
+<label>Description<input id="description" placeholder="e.g. Lunch" required></label>
+<div class="row"><label>Category<select id="category"></select></label><label>Payment<select id="payment"><option>UPI</option><option>Cash</option><option>Debit Card</option><option>Credit Card</option><option>Bank Transfer</option><option>Other</option></select></label></div>
+<label>Date<input id="date" type="date" required></label>
+<label>Note<input id="note" placeholder="Optional"></label>
+<button class="btn primary" type="submit">Save</button>
+</form></div></div>
+
+<div class="modal" id="budgetModal"><div class="sheet">
+<button class="close" onclick="closeBudget()">×</button><h2>Monthly Budget</h2>
+<form onsubmit="saveBudget(event)"><label>Budget for selected month (₹)<input id="budgetInput" type="number" min="0" step="100"></label><button class="btn primary">Save Budget</button></form>
+</div></div>
+
+<script>
+const cats=['Food','Travel','Shopping','Bills','Rent','Entertainment','Health','Education','Subscriptions','Family','Other'];
+let data=JSON.parse(localStorage.getItem('expenseTrackerData')||'[]');
+let budgets=JSON.parse(localStorage.getItem('expenseTrackerBudgets')||'{}');
+let selectedMonth=new Date().toISOString().slice(0,7), tab='dashboard';
+
+const monthEl=document.getElementById('month');
+function init(){
+ for(let y=new Date().getFullYear()-2;y<=new Date().getFullYear()+1;y++) for(let m=1;m<=12;m++){
+  let v=`${y}-${String(m).padStart(2,'0')}`; let o=document.createElement('option');o.value=v;o.text=new Date(y,m-1,1).toLocaleString('en-IN',{month:'long',year:'numeric'});monthEl.appendChild(o)
+ }
+ monthEl.value=selectedMonth; monthEl.onchange=()=>{selectedMonth=monthEl.value;render()};
+ document.getElementById('category').innerHTML=cats.map(x=>`<option>${x}</option>`).join('');
+ document.getElementById('date').value=new Date().toISOString().slice(0,10); render();
+}
+function money(n){return '₹'+Number(n||0).toLocaleString('en-IN',{maximumFractionDigits:2})}
+function monthData(){return data.filter(x=>x.date.slice(0,7)===selectedMonth)}
+function render(){
+ let el=document.getElementById('content'); if(tab==='dashboard') renderDash(el); else if(tab==='transactions') renderTx(el); else renderSettings(el);
+}
+function renderDash(el){
+ let a=monthData(), inc=a.filter(x=>x.type==='income').reduce((s,x)=>s+x.amount,0), exp=a.filter(x=>x.type==='expense').reduce((s,x)=>s+x.amount,0), bal=inc-exp,b=budgets[selectedMonth]||0;
+ let by={};a.filter(x=>x.type==='expense').forEach(x=>by[x.category]=(by[x.category]||0)+x.amount);
+ let max=Math.max(...Object.values(by),1), recent=[...a].sort((x,y)=>y.date.localeCompare(x.date)).slice(0,5);
+ el.innerHTML=`<div class="grid"><div class="card"><div class="label">Income</div><div class="value income">${money(inc)}</div></div><div class="card"><div class="label">Expenses</div><div class="value expense">${money(exp)}</div></div><div class="card"><div class="label">Balance</div><div class="value balance">${money(bal)}</div></div><div class="card"><div class="label">Budget Left</div><div class="value">${b?money(b-exp):'—'}</div></div></div>
+ <div class="section"><div class="actions"><button class="btn primary" onclick="openModal('expense')">＋ Add Expense</button><button class="btn secondary" onclick="openModal('income')">＋ Add Income</button></div></div>
+ ${b?`<div class="section"><div class="card"><div style="display:flex;justify-content:space-between"><b>Budget</b><span class="muted">${money(exp)} / ${money(b)}</span></div><div class="progress" style="margin-top:9px"><div style="width:${Math.min(exp/b*100,100)}%"></div></div></div></div>`:''}
+ <div class="section"><h2>Spending by Category</h2><div class="bars">${Object.keys(by).length?Object.entries(by).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<div class="barrow"><div class="barhead"><span>${k}</span><b>${money(v)}</b></div><div class="track"><div class="fill" style="width:${v/max*100}%"></div></div></div>`).join(''):'<div class="empty">No expenses this month</div>'}</div></div>
+ <div class="section"><h2>Recent</h2><div class="list">${recent.length?recent.map(itemHTML).join(''):'<div class="card empty">No transactions yet</div>'}</div></div>`;
+}
+function itemHTML(x){return `<div class="item"><div><div class="desc">${x.description}</div><small>${x.category} • ${x.payment} • ${x.date}${x.note?' • '+x.note:''}</small></div><div class="amount ${x.type==='expense'?'exp':'inc'}">${x.type==='expense'?'-':'+'}${money(x.amount)}</div></div>`}
+function renderTx(el){
+ let a=[...data].sort((x,y)=>y.date.localeCompare(x.date));
+ el.innerHTML=`<div class="section"><div class="actions"><button class="btn primary" onclick="openModal('expense')">＋ Expense</button><button class="btn secondary" onclick="openModal('income')">＋ Income</button></div><h2 style="margin-top:20px">All Transactions</h2><div class="list">${a.length?a.map((x,i)=>itemHTML(x)+`<button class="btn secondary" onclick="del(${data.indexOf(x)})">Delete</button>`).join(''):'<div class="card empty">No transactions</div>'}</div></div>`;
+}
+function renderSettings(el){
+ el.innerHTML=`<div class="section"><h2>Settings & Data</h2><div class="card"><p><b>Transactions:</b> ${data.length}</p><p class="muted">Data is stored locally in this browser on your phone.</p><div class="actions"><button class="btn secondary" onclick="exportData()">Export Backup</button><button class="btn secondary" onclick="document.getElementById('file').click()">Import Backup</button></div><input id="file" type="file" accept=".json" style="display:none" onchange="importData(event)"><hr><button class="btn secondary" onclick="clearData()">Delete All Data</button></div></div>`;
+}
+function showTab(t,btn){tab=t;document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));btn.classList.add('active');render()}
+function openModal(type){document.getElementById('modal').classList.add('show');document.getElementById('type').value=type;document.getElementById('modalTitle').textContent=type==='expense'?'Add Expense':'Add Income';document.getElementById('form').reset();document.getElementById('date').value=new Date().toISOString().slice(0,10)}
+function closeModal(){document.getElementById('modal').classList.remove('show')}
+document.getElementById('form').onsubmit=e=>{e.preventDefault();data.push({id:Date.now(),type:document.getElementById('type').value,amount:+amount.value,description:description.value,category:category.value,payment:payment.value,date:date.value,note:note.value});localStorage.setItem('expenseTrackerData',JSON.stringify(data));closeModal();render()}
+function del(i){if(confirm('Delete this transaction?')){data.splice(i,1);localStorage.setItem('expenseTrackerData',JSON.stringify(data));render()}}
+function openBudget(){budgetModal.classList.add('show');budgetInput.value=budgets[selectedMonth]||''}
+function closeBudget(){budgetModal.classList.remove('show')}
+function saveBudget(e){e.preventDefault();budgets[selectedMonth]=+budgetInput.value||0;localStorage.setItem('expenseTrackerBudgets',JSON.stringify(budgets));closeBudget();render()}
+function exportData(){let blob=new Blob([JSON.stringify({data,budgets},null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='expense-tracker-backup.json';a.click()}
+function importData(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{let o=JSON.parse(r.result);data=o.data||[];budgets=o.budgets||{};localStorage.setItem('expenseTrackerData',JSON.stringify(data));localStorage.setItem('expenseTrackerBudgets',JSON.stringify(budgets));render();alert('Backup imported')}catch{alert('Invalid backup file')}};r.readAsText(f)}
+function clearData(){if(confirm('Delete ALL transactions and budgets?')){data=[];budgets={};localStorage.clear();render()}}
+init();
+</script>
+<script>
+if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))}
+</script>
+</body></html>
