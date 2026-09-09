@@ -3,7 +3,7 @@
   "short_name": "Expenses",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#f5f7f8",
+  "background_color": "#f4f7f5",
   "theme_color": "#0b9f5a",
-  "description": "Personal expense, income and money given/borrowed tracker"
+  "description": "Personal expense tracker"
 }

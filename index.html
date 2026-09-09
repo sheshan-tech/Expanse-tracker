@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1"><link rel="manifest" href="manifest.json"><meta name="theme-color" content="#0b9f5a">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Expense Tracker Prototype</title>
 <style>
 *{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;background:#f5f7f8;color:#17212b}
@@ -25,6 +25,50 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:10px 8px;
 
 .inline-add{display:flex;gap:7px;margin-top:8px}.inline-add input{flex:1;padding:9px;border:1px solid #dfe5e8;border-radius:8px}.inline-add button{padding:9px 12px;border:0;border-radius:8px;background:#0b9f5a;color:#fff;font-weight:700;cursor:pointer}
 .cat-date-table{margin-top:8px}.cat-date-table td,.cat-date-table th{padding:8px 6px}
+
+/* Mobile-first refinements */
+@media(max-width:600px){
+  body{font-size:14px;background:#f4f7f5;overflow-x:hidden}
+  .app{display:block;min-height:100dvh}
+  .side{display:none}
+  .main{padding:14px 12px 84px;width:100%;overflow:visible}
+  .top{margin-bottom:12px;gap:8px;align-items:center}
+  .top h1{font-size:21px;line-height:1.15}
+  .datepill{font-size:10px;padding:7px 9px;white-space:nowrap}
+  .cards{grid-template-columns:1fr 1fr;gap:9px}
+  .card{padding:12px;border-radius:12px}
+  .label{font-size:10px}.value{font-size:19px;margin-top:5px}
+  .actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}
+  .btn{padding:11px 10px;font-size:12px}
+  .grid{display:block}
+  .section{padding:13px;margin-bottom:10px;border-radius:12px;overflow:hidden}
+  .section h2{font-size:14px;margin-bottom:10px}
+  .donutrow{gap:12px;align-items:center}
+  .donut{width:125px;height:125px;flex:0 0 125px}
+  .donut:after{inset:28px;font-size:12px}
+  .legend{font-size:11px}
+  .legend div{margin:6px 0;font-size:11px}
+  .chart{height:170px;gap:7px;padding:8px 2px 24px}
+  .bars{height:125px}.bar{width:13px}
+  .filters{grid-template-columns:1fr 1fr;gap:8px}
+  .filters .field:nth-child(3),.filters .field:nth-child(4){grid-column:1/-1}
+  .filters .btn{grid-column:span 1;width:100%}
+  .field label{font-size:10px}.field input,.field select{padding:9px;font-size:13px;min-width:0}
+  table{min-width:650px;font-size:12px}
+  .section:has(table){overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .manage{grid-template-columns:1fr}
+  .modal{padding:10px;align-items:flex-end}
+  .modalbox{width:100%;max-height:92dvh;overflow:auto;border-radius:18px 18px 0 0;padding:16px}
+  .formgrid{grid-template-columns:1fr 1fr;gap:9px}
+  .formgrid .full{grid-column:1/-1}
+  .modalbox input,.modalbox select{font-size:16px}
+  .modalfoot{position:sticky;bottom:0;background:#fff;padding-top:10px}
+  /* compact bottom navigation */
+  .mobile-nav{position:fixed;display:flex;bottom:0;left:0;right:0;height:64px;background:#fff;border-top:1px solid #e3e8e5;z-index:20;padding:5px 4px env(safe-area-inset-bottom)}
+  .mobile-nav button{flex:1;border:0;background:transparent;border-radius:9px;font-size:10px;color:#65727b}
+  .mobile-nav button.active{background:#e7f7ef;color:#078a4e;font-weight:700}
+}
+@media(min-width:601px){.mobile-nav{display:none}}
 </style>
 </head>
 <body>
@@ -246,7 +290,22 @@ function saveTxn(){let a=Number(document.getElementById('amount').value),d=docum
 function addCat(){let v=document.getElementById('newCat').value.trim();if(v&&!cats.includes(v)){cats.push(v);document.getElementById('newCat').value='';renderLists();populateFormOptions();updateSpendingCategoryOptions(v)}}
 function addPay(){let v=document.getElementById('newPay').value.trim();if(v&&!pays.includes(v)){pays.push(v);document.getElementById('newPay').value='';renderLists();populateFormOptions()}}
 function renderLists(){document.getElementById('catList').innerHTML=cats.map(x=>`<div class="listrow">🏷️ ${x}<span>🗑️</span></div>`).join('');document.getElementById('payList').innerHTML=pays.map(x=>`<div class="listrow">💳 ${x}<span>🗑️</span></div>`).join('')}
-document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(b.dataset.page).classList.add('active');document.getElementById('pageTitle').textContent=b.textContent.replace(/[^\w\s]/g,'').trim()});
+function goPage(page){
+ document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+ const target=document.getElementById(page); if(target) target.classList.add('active');
+ document.querySelectorAll('.nav button,.mobile-nav button').forEach(x=>x.classList.toggle('active',x.dataset.page===page));
+ const btn=document.querySelector(`.nav button[data-page="${page}"]`)||document.querySelector(`.mobile-nav button[data-page="${page}"]`);
+ if(btn) document.getElementById('pageTitle').textContent=btn.textContent.replace(/[^\w\s]/g,'').trim();
+ window.scrollTo({top:0,behavior:'smooth'});
+}
+document.querySelectorAll('.nav button,.mobile-nav button').forEach(b=>b.onclick=()=>goPage(b.dataset.page));
 render(tx);renderLists();populateFormOptions();updateSpendingCategoryOptions('Food');showCategory('Food');renderMoney();
 </script>
-<script>if("serviceWorker" in navigator){navigator.serviceWorker.register("./sw.js").catch(()=>{});}</script></body></html>
+
+<div class="mobile-nav" id="mobileNav">
+ <button class="active" data-page="dashboard">🏠<br>Home</button>
+ <button data-page="transactions">📋<br>Transactions</button>
+ <button data-page="money">🤝<br>Money</button>
+ <button data-page="settings">⚙️<br>Settings</button>
+</div>
+</body></html>
