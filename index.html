@@ -2,310 +2,214 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Expense Tracker Prototype</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111827">
+<meta name="description" content="Simple personal expense tracker">
+<link rel="manifest" href="manifest.json">
+<title>Expense Tracker</title>
 <style>
-*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;background:#f5f7f8;color:#17212b}
-.app{display:flex;min-height:100vh}.side{width:220px;background:#fff;border-right:1px solid #e5e9ec;padding:22px 14px;position:sticky;top:0;height:100vh}
-.brand{font-size:21px;font-weight:800;margin:4px 10px 24px}.brand span{color:#0b9f5a}.nav button{width:100%;border:0;background:transparent;text-align:left;padding:12px 14px;border-radius:10px;margin:3px 0;font-size:14px;cursor:pointer}.nav button.active,.nav button:hover{background:#e7f7ef;color:#078a4e;font-weight:700}
-.main{flex:1;padding:22px;overflow:auto}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}.top h1{margin:0;font-size:24px}.datepill{background:#fff;border:1px solid #e2e7ea;border-radius:10px;padding:10px 14px;font-size:13px}
-.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.card{background:#fff;border:1px solid #e7ebee;border-radius:14px;padding:17px;box-shadow:0 2px 8px #00000008}.label{font-size:12px;color:#6b7782}.value{font-size:24px;font-weight:800;margin-top:7px}.green{color:#079653}.red{color:#e53935}.blue{color:#1574d1}.purple{color:#7046d8}
-.actions{display:flex;gap:10px;margin:15px 0}.btn{border:0;border-radius:9px;padding:11px 18px;font-weight:700;cursor:pointer}.primary{background:#0b9f5a;color:#fff}.income{background:#147be8;color:#fff}.ghost{background:#fff;border:1px solid #dce2e6}
-.grid{display:grid;grid-template-columns:1.4fr 1fr;gap:14px}.section{background:#fff;border:1px solid #e7ebee;border-radius:14px;padding:16px;margin-bottom:14px}.section h2{font-size:16px;margin:0 0 14px}
-.chart{height:210px;display:flex;align-items:end;gap:16px;padding:12px 10px 28px;border-bottom:1px solid #ddd}.barwrap{flex:1;text-align:center;font-size:11px;color:#68737d}.bars{height:155px;display:flex;align-items:end;justify-content:center;gap:5px}.bar{width:20px;border-radius:5px 5px 0 0}.bar.i{background:#19ad6b}.bar.e{background:#ef5b5b}
-.donutrow{display:flex;align-items:center;gap:24px}.donut{width:170px;height:170px;border-radius:50%;background:conic-gradient(#18ad6b 0 28%,#7355d8 28% 46%,#f5a623 46% 61%,#ef5b5b 61% 73%,#d95782 73% 81%,#8b99a8 81% 100%);position:relative}.donut:after{content:"₹12,450\A Total";white-space:pre;text-align:center;position:absolute;inset:38px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px}
-.legend div{margin:9px 0;font-size:13px}.dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:7px}
-.filters{display:grid;grid-template-columns:1fr 1fr 1fr 1fr auto auto;gap:9px;align-items:end}.field label{display:block;font-size:11px;color:#6c7780;margin-bottom:5px}.field input,.field select{width:100%;padding:10px;border:1px solid #dfe5e8;border-radius:8px;background:#fff}
-table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:10px 8px;border-bottom:1px solid #edf0f2;text-align:left}th{font-size:11px;color:#697681;background:#fafbfc}td.amount{text-align:right;font-weight:700}.tag{padding:4px 8px;border-radius:20px;font-size:11px}.tag.exp{background:#ffe9e9;color:#d83434}.tag.inc{background:#e3f8ed;color:#087d47}
-.rightbox{height:100%}.detail{border:1px solid #e1e6e9;border-radius:10px;padding:12px;background:#f8fcfa}.detailhead{display:flex;justify-content:space-between}.detail h3{margin:0;font-size:15px}.detail .big{font-size:22px;font-weight:800;color:#078d50}.small{font-size:11px;color:#74808a}
-.manage{display:grid;grid-template-columns:1fr 1fr;gap:14px}.listrow{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #eef1f2;font-size:13px}.mini{display:flex;gap:7px}.mini input{flex:1;padding:9px;border:1px solid #dfe5e8;border-radius:7px}
-.page{display:none}.page.active{display:block}
-.modal{position:fixed;inset:0;background:#0007;display:none;align-items:center;justify-content:center;padding:15px}.modal.show{display:flex}.modalbox{background:#fff;width:min(520px,100%);border-radius:15px;padding:20px}.modalbox h2{margin-top:0}.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.formgrid .full{grid-column:1/-1}.modalfoot{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
-@media(max-width:900px){.side{display:none}.main{padding:13px}.cards{grid-template-columns:1fr 1fr}.grid{grid-template-columns:1fr}.filters{grid-template-columns:1fr 1fr}.filters .btn{width:100%}.manage{grid-template-columns:1fr}.top h1{font-size:20px}}
-
-.inline-add{display:flex;gap:7px;margin-top:8px}.inline-add input{flex:1;padding:9px;border:1px solid #dfe5e8;border-radius:8px}.inline-add button{padding:9px 12px;border:0;border-radius:8px;background:#0b9f5a;color:#fff;font-weight:700;cursor:pointer}
-.cat-date-table{margin-top:8px}.cat-date-table td,.cat-date-table th{padding:8px 6px}
-
-/* Mobile-first refinements */
-@media(max-width:600px){
-  body{font-size:14px;background:#f4f7f5;overflow-x:hidden}
-  .app{display:block;min-height:100dvh}
-  .side{display:none}
-  .main{padding:14px 12px 84px;width:100%;overflow:visible}
-  .top{margin-bottom:12px;gap:8px;align-items:center}
-  .top h1{font-size:21px;line-height:1.15}
-  .datepill{font-size:10px;padding:7px 9px;white-space:nowrap}
-  .cards{grid-template-columns:1fr 1fr;gap:9px}
-  .card{padding:12px;border-radius:12px}
-  .label{font-size:10px}.value{font-size:19px;margin-top:5px}
-  .actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}
-  .btn{padding:11px 10px;font-size:12px}
-  .grid{display:block}
-  .section{padding:13px;margin-bottom:10px;border-radius:12px;overflow:hidden}
-  .section h2{font-size:14px;margin-bottom:10px}
-  .donutrow{gap:12px;align-items:center}
-  .donut{width:125px;height:125px;flex:0 0 125px}
-  .donut:after{inset:28px;font-size:12px}
-  .legend{font-size:11px}
-  .legend div{margin:6px 0;font-size:11px}
-  .chart{height:170px;gap:7px;padding:8px 2px 24px}
-  .bars{height:125px}.bar{width:13px}
-  .filters{grid-template-columns:1fr 1fr;gap:8px}
-  .filters .field:nth-child(3),.filters .field:nth-child(4){grid-column:1/-1}
-  .filters .btn{grid-column:span 1;width:100%}
-  .field label{font-size:10px}.field input,.field select{padding:9px;font-size:13px;min-width:0}
-  table{min-width:650px;font-size:12px}
-  .section:has(table){overflow-x:auto;-webkit-overflow-scrolling:touch}
-  .manage{grid-template-columns:1fr}
-  .modal{padding:10px;align-items:flex-end}
-  .modalbox{width:100%;max-height:92dvh;overflow:auto;border-radius:18px 18px 0 0;padding:16px}
-  .formgrid{grid-template-columns:1fr 1fr;gap:9px}
-  .formgrid .full{grid-column:1/-1}
-  .modalbox input,.modalbox select{font-size:16px}
-  .modalfoot{position:sticky;bottom:0;background:#fff;padding-top:10px}
-  /* compact bottom navigation */
-  .mobile-nav{position:fixed;display:flex;bottom:0;left:0;right:0;height:64px;background:#fff;border-top:1px solid #e3e8e5;z-index:20;padding:5px 4px env(safe-area-inset-bottom)}
-  .mobile-nav button{flex:1;border:0;background:transparent;border-radius:9px;font-size:10px;color:#65727b}
-  .mobile-nav button.active{background:#e7f7ef;color:#078a4e;font-weight:700}
-}
-@media(min-width:601px){.mobile-nav{display:none}}
+:root{--bg:#f6f7fb;--card:#fff;--text:#111827;--muted:#6b7280;--line:#e5e7eb;--primary:#111827;--green:#15803d;--red:#dc2626;--blue:#2563eb;--shadow:0 6px 20px rgba(15,23,42,.06);--r:16px}
+*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--text);font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+button,input,select,textarea{font:inherit}button{cursor:pointer}.app{min-height:100vh}.desktop{display:flex}.side{width:230px;position:fixed;inset:0 auto 0 0;background:#111827;color:#fff;padding:22px 14px;z-index:10}.brand{font-size:20px;font-weight:800;padding:8px 10px 24px}.nav button{width:100%;border:0;background:transparent;color:#cbd5e1;text-align:left;padding:12px;border-radius:10px;margin:2px 0}.nav button.active,.nav button:hover{background:#1f2937;color:#fff}.main{margin-left:230px;width:calc(100% - 230px);padding:26px;max-width:1400px}.mobile-nav{display:none}
+header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:22px}h1{font-size:25px;margin:0}h2{font-size:18px;margin:0 0 14px}.sub{color:var(--muted);font-size:13px}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px;box-shadow:var(--shadow)}.metric .label{color:var(--muted);font-size:13px}.metric .value{font-size:25px;font-weight:800;margin-top:7px}.green{color:var(--green)}.red{color:var(--red)}.blue{color:var(--blue)}
+.section{margin-top:18px}.two{display:grid;grid-template-columns:1.1fr .9fr;gap:18px}.toolbar{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:13px}
+.btn{border:1px solid var(--line);background:#fff;color:var(--text);padding:10px 14px;border-radius:10px;font-weight:650}.btn.primary{background:var(--primary);border-color:var(--primary);color:#fff}.btn.danger{color:var(--red)}.btn.small{padding:7px 10px;font-size:13px}
+table{width:100%;border-collapse:collapse}th,td{padding:11px 8px;border-bottom:1px solid var(--line);text-align:left;font-size:13px}th{color:var(--muted);font-weight:650}td:last-child,th:last-child{text-align:right}.empty{text-align:center;color:var(--muted);padding:28px 10px}
+form{display:grid;gap:12px}.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}label{display:grid;gap:6px;font-size:13px;font-weight:650}input,select,textarea{width:100%;padding:11px 12px;border:1px solid #d1d5db;border-radius:10px;background:#fff;color:var(--text);outline:none}input:focus,select:focus,textarea:focus{border-color:#64748b;box-shadow:0 0 0 3px rgba(100,116,139,.12)}textarea{min-height:80px;resize:vertical}.actions{display:flex;justify-content:flex-end;gap:8px;margin-top:3px}
+.page{display:none}.page.active{display:block}.pill{display:inline-block;padding:4px 8px;border-radius:999px;background:#f3f4f6;font-size:12px}.money-given{color:var(--red)}.money-receive{color:var(--green)}
+.modal{position:fixed;inset:0;background:rgba(15,23,42,.48);display:none;align-items:flex-end;justify-content:center;z-index:30}.modal.show{display:flex}.modal-box{background:#fff;width:min(560px,100%);max-height:92vh;overflow:auto;border-radius:20px 20px 0 0;padding:20px}.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}.close{border:0;background:#f3f4f6;border-radius:50%;width:34px;height:34px}
+.category-list,.people-list{display:grid;gap:8px}.list-row{display:flex;justify-content:space-between;align-items:center;border:1px solid var(--line);border-radius:11px;padding:11px 12px}.list-row .right{display:flex;gap:7px;align-items:center}
+.notice{background:#f8fafc;border:1px dashed #cbd5e1;border-radius:12px;padding:12px;color:#475569;font-size:13px}
+@media(max-width:850px){.desktop{display:none}.main{margin:0;width:100%;padding:16px 14px 88px}.grid{grid-template-columns:1fr 1fr}.two{grid-template-columns:1fr}.mobile-nav{display:grid;grid-template-columns:repeat(4,1fr);position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);z-index:20;padding:7px 5px calc(7px + env(safe-area-inset-bottom))}.mobile-nav button{border:0;background:transparent;color:var(--muted);font-size:11px;padding:5px}.mobile-nav button.active{color:var(--text);font-weight:800}header{align-items:flex-start}h1{font-size:22px}.row{grid-template-columns:1fr}table{min-width:620px}.table-wrap{overflow:auto}.card{padding:15px}}
+@media(min-width:851px){.modal{align-items:center}.modal-box{border-radius:18px}}
 </style>
 </head>
 <body>
 <div class="app">
-<aside class="side"><div class="brand">💰 <span>Expense</span> Tracker</div><div class="nav">
-<button class="active" data-page="dashboard">📊 Dashboard</button><button data-page="transactions">📋 Transactions</button><button data-page="categories">🏷️ Categories</button><button data-page="payments">💳 Payment Options</button><button data-page="money">🤝 Money Given / Borrowed</button><button data-page="settings">⚙️ Settings</button>
-</div></aside>
+<aside class="side desktop">
+  <div class="brand">₹ Expense Tracker</div>
+  <nav class="nav" id="sideNav"></nav>
+</aside>
 <main class="main">
-<div class="top"><h1 id="pageTitle">Dashboard</h1><div class="datepill">📅 01 Sep 2026 - 09 Sep 2026</div></div>
+  <header><div><h1 id="pageTitle">Dashboard</h1><div class="sub">Your money, stored locally on this device.</div></div><button class="btn primary" id="quickAdd">+ Add</button></header>
 
-<section id="dashboard" class="page active">
-<div class="cards">
-<div class="card"><div class="label">Total Income</div><div class="value green">₹50,000</div></div><div class="card"><div class="label">Total Expenses</div><div class="value red">₹12,450</div></div><div class="card"><div class="label">Balance</div><div class="value blue">₹37,550</div></div><div class="card"><div class="label">Transactions</div><div class="value purple" id="countCard">20</div></div>
-</div>
-<div class="actions"><button class="btn primary" onclick="openModal('expense')">＋ Add Expense</button><button class="btn income" onclick="openModal('income')">＋ Add Income</button></div>
-<div class="grid">
-<div>
-<div class="section"><div style="display:flex;justify-content:space-between;align-items:center;gap:12px"><h2 style="margin:0">Spending by Category</h2><select id="spendingCategory" onchange="showCategory(this.value)" style="width:190px;padding:9px;border:1px solid #dfe5e8;border-radius:8px;background:#fff"></select></div><div class="donutrow" style="margin-top:14px"><div class="donut"></div><div class="legend"><div><i class="dot" style="background:#18ad6b"></i>Food — ₹3,500</div><div><i class="dot" style="background:#7355d8"></i>Travel — ₹2,250</div><div><i class="dot" style="background:#f5a623"></i>Shopping — ₹1,850</div><div><i class="dot" style="background:#ef5b5b"></i>Bills — ₹1,500</div><div><i class="dot" style="background:#8b99a8"></i>Others — ₹3,350</div></div></div><div id="spendingCategoryDetails" style="margin-top:14px"></div></div>
-<div class="section"><h2>Monthly Trend</h2><div class="chart">
-<div class="barwrap"><div class="bars"><span class="bar i" style="height:70px"></span><span class="bar e" style="height:25px"></span></div>Apr</div><div class="barwrap"><div class="bars"><span class="bar i" style="height:85px"></span><span class="bar e" style="height:38px"></span></div>May</div><div class="barwrap"><div class="bars"><span class="bar i" style="height:100px"></span><span class="bar e" style="height:50px"></span></div>Jun</div><div class="barwrap"><div class="bars"><span class="bar i" style="height:125px"></span><span class="bar e" style="height:65px"></span></div>Jul</div><div class="barwrap"><div class="bars"><span class="bar i" style="height:145px"></span><span class="bar e" style="height:78px"></span></div>Aug</div><div class="barwrap"><div class="bars"><span class="bar i" style="height:120px"></span><span class="bar e" style="height:70px"></span></div>Sep</div>
-</div></div>
-</div>
-</div><div class="section"><h2>Filter Transactions</h2><div class="filters">
-<div class="field"><label>From Date</label><input type="date" id="from" value="2026-09-01"></div><div class="field"><label>To Date</label><input type="date" id="to" value="2026-09-09"></div><div class="field"><label>Category</label><select id="catFilter"><option>All</option><option>Food</option><option>Travel</option><option>Shopping</option><option>Bills</option><option>Others</option></select></div><div class="field"><label>Payment Mode</label><select id="payFilter"><option>All</option><option>UPI</option><option>Cash</option><option>Card</option><option>Bank Transfer</option><option>Wallet</option></select></div><button class="btn primary" onclick="applyFilter()">Apply Filter</button><button class="btn ghost" onclick="resetFilter()">Reset</button>
-</div></div>
-<div class="section"><h2>Recent Transactions</h2><table><thead><tr><th>Date & Time</th><th>Type</th><th>Description</th><th>Category</th><th>Payment</th><th style="text-align:right">Amount</th></tr></thead><tbody id="recent"></tbody></table></div>
-</section>
+  <section id="dashboard" class="page active">
+    <div class="grid">
+      <div class="card metric"><div class="label">Income</div><div class="value green" id="mIncome">₹0</div></div>
+      <div class="card metric"><div class="label">Expenses</div><div class="value red" id="mExpense">₹0</div></div>
+      <div class="card metric"><div class="label">Balance</div><div class="value blue" id="mBalance">₹0</div></div>
+      <div class="card metric"><div class="label">Transactions</div><div class="value" id="mCount">0</div></div>
+    </div>
+    <div class="two section">
+      <div class="card"><h2>Spending by Category</h2><div class="toolbar"><select id="categoryFilter"><option value="">All categories</option></select></div><div id="categorySummary"></div></div>
+      <div class="card"><h2>Recent Transactions</h2><div id="recent"></div></div>
+    </div>
+  </section>
 
-<section id="transactions" class="page"><div class="section"><h2>All Transactions</h2><table><thead><tr><th>Date & Time</th><th>Type</th><th>Description</th><th>Category</th><th>Payment</th><th style="text-align:right">Amount</th></tr></thead><tbody id="all"></tbody></table></div></section>
-
-<section id="categories" class="page"><div class="section"><h2>Manage Categories</h2><div class="mini"><input id="newCat" placeholder="Enter new category name"><button class="btn primary" onclick="addCat()">Add</button></div><div id="catList"></div></div></section>
-<section id="payments" class="page"><div class="section"><h2>Manage Payment Options</h2><div class="mini"><input id="newPay" placeholder="Enter new payment mode"><button class="btn primary" onclick="addPay()">Add</button></div><div id="payList"></div></div></section>
-
-<section id="money" class="page">
-  <div class="cards">
-    <div class="card"><div class="label">Maine Diya Hai</div><div class="value red" id="givenTotal">₹0</div></div>
-    <div class="card"><div class="label">Mujhe Lena Hai</div><div class="value green" id="receiveTotal">₹0</div></div>
-    <div class="card"><div class="label">Maine Wapas Liya</div><div class="value blue" id="receivedBackTotal">₹0</div></div>
-    <div class="card"><div class="label">Mujhe Dena Hai</div><div class="value purple" id="borrowedTotal">₹0</div></div>
-  </div>
-  <div class="actions">
-    <button class="btn primary" onclick="openMoneyModal()">＋ Add Money Record</button>
-    <button class="btn ghost" onclick="addPerson()">＋ Add Person</button>
-  </div>
-  <div class="grid">
-    <div class="section">
-      <h2>Person-wise Data</h2>
-      <div class="field">
-        <label>Select Person</label>
-        <select id="personFilter" onchange="renderMoney()"></select>
+  <section id="transactions" class="page">
+    <div class="card">
+      <div class="toolbar">
+        <button class="btn primary" id="addExpense">+ Expense</button><button class="btn" id="addIncome">+ Income</button>
+        <input type="date" id="txDate" aria-label="Filter by date"><button class="btn small" id="clearTxDate">All dates</button>
       </div>
-      <div id="personSummary" style="margin-top:14px"></div>
+      <div class="table-wrap"><table><thead><tr><th>Date</th><th>Type</th><th>Category</th><th>Amount</th><th>Payment</th><th></th></tr></thead><tbody id="txBody"></tbody></table></div>
     </div>
-    <div class="section">
-      <h2>All People</h2>
-      <div id="peopleList"></div>
+  </section>
+
+  <section id="money" class="page">
+    <div class="two">
+      <div class="card">
+        <div class="toolbar"><button class="btn primary" id="addMoney">+ Money Record</button><button class="btn" id="addPerson">+ Person</button></div>
+        <div id="peopleSummary"></div>
+      </div>
+      <div class="card"><h2>Money Given / Borrowed</h2><div id="moneyBody"></div></div>
     </div>
-  </div>
-  <div class="section">
-    <h2>Money Transactions</h2>
-    <table><thead><tr><th>Date & Time</th><th>Person</th><th>Type</th><th>Payment</th><th>Note</th><th style="text-align:right">Amount</th></tr></thead>
-    <tbody id="moneyTable"></tbody></table>
-  </div>
-</section>
-<section id="settings" class="page"><div class="section"><h2>Settings</h2><p>💾 Export Backup &nbsp; | &nbsp; 📥 Import Backup &nbsp; | &nbsp; 🗑️ Clear Data</p><p class="small">Prototype data is kept in this browser only.</p></div></section>
-</main></div>
+  </section>
 
-
-<div class="modal" id="moneyModal"><div class="modalbox">
-<h2>Add Money Record</h2>
-<div class="formgrid">
-<div class="field"><label>Person *</label><select id="moneyPerson"></select></div>
-<div class="field"><label>Type *</label><select id="moneyType"><option value="given">Maine Diya</option><option value="borrowed">Maine Liya</option><option value="received">Wapas Liya</option><option value="returned">Wapas Diya</option></select></div>
-<div class="field"><label>Amount *</label><input id="moneyAmount" type="number" placeholder="₹ 0"></div>
-<div class="field"><label>Date *</label><input id="moneyDate" type="date" value="2026-09-09"></div>
-<div class="field"><label>Time (Optional)</label><input id="moneyTime" type="time"></div>
-<div class="field"><label>Payment Mode</label><select id="moneyPay"></select></div>
-<div class="field full"><label>Note</label><input id="moneyNote" placeholder="e.g. Dinner / Loan / UPI transfer"></div>
+  <section id="settings" class="page">
+    <div class="two">
+      <div class="card"><h2>Categories</h2><div class="toolbar"><input id="newCategory" placeholder="New category"><button class="btn primary" id="saveCategory">Add</button></div><div class="category-list" id="categoryList"></div></div>
+      <div class="card"><h2>Payment Options</h2><div class="toolbar"><input id="newPayment" placeholder="New payment mode"><button class="btn primary" id="savePayment">Add</button></div><div class="category-list" id="paymentList"></div></div>
+    </div>
+    <div class="card section"><h2>Backup & Data</h2><div class="notice">All entries are stored in your browser's local storage. Export a backup before clearing browser/site data.</div><div class="toolbar" style="margin-top:12px"><button class="btn" id="exportData">Export Backup</button><button class="btn" id="importBtn">Import Backup</button><button class="btn danger" id="clearData">Clear All Data</button><input id="importFile" type="file" accept="application/json" hidden></div></div>
+  </section>
+</main>
+<nav class="mobile-nav" id="mobileNav"></nav>
 </div>
-<div class="modalfoot"><button class="btn ghost" onclick="closeMoneyModal()">Cancel</button><button class="btn primary" onclick="saveMoney()">Save</button></div>
-</div></div>
-<div class="modal" id="modal"><div class="modalbox"><h2 id="modalTitle">Add Expense</h2><div class="formgrid">
-<div class="field"><label>Amount *</label><input id="amount" type="number" placeholder="₹ 0"></div>
-<div class="field"><label>Date *</label><input id="date" type="date" value="2026-09-09"></div>
-<div class="field full"><label>Description *</label><input id="desc" placeholder="e.g. Lunch at office"></div>
-<div class="field"><label>Category</label><select id="formCat" onchange="handleNewSelect(this,'category')"></select></div>
-<div class="field"><label>Payment Mode</label><select id="formPay" onchange="handleNewSelect(this,'payment')"></select></div>
-<div class="field"><label>Time (Optional)</label><input id="time" type="time"></div>
-<div class="field full"><label>Note</label><input id="note" placeholder="Optional note"></div>
-</div><div class="modalfoot"><button class="btn ghost" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="saveTxn()">Save</button></div></div></div>
+
+<div class="modal" id="modal"><div class="modal-box"><div class="modal-head"><h2 id="modalTitle">Add</h2><button class="close" id="closeModal">×</button></div><div id="modalContent"></div></div></div>
 
 <script>
-let cats=['Food','Travel','Shopping','Bills','Health','Education','Others','Salary'];
-let pays=['Cash','UPI','Debit Card','Credit Card','Net Banking','Wallet','Bank Transfer','Others'];
-let tx=[
-{d:'2026-09-09',t:'13:30',type:'Expense',desc:'Lunch at office',cat:'Food',pay:'UPI',amt:500},
-{d:'2026-09-08',t:'10:00',type:'Income',desc:'Monthly salary',cat:'Salary',pay:'Bank Transfer',amt:10000},
-{d:'2026-09-08',t:'18:20',type:'Expense',desc:'Groceries',cat:'Shopping',pay:'Cash',amt:1200},
-{d:'2026-09-07',t:'21:15',type:'Expense',desc:'Dinner',cat:'Food',pay:'Cash',amt:400},
-{d:'2026-09-06',t:'12:15',type:'Expense',desc:'Food Delivery',cat:'Food',pay:'Card',amt:750},
-{d:'2026-09-05',t:'09:15',type:'Expense',desc:'Electricity Bill',cat:'Bills',pay:'Card',amt:2500},
-{d:'2026-09-04',t:'08:45',type:'Expense',desc:'Cab',cat:'Travel',pay:'UPI',amt:350},
-{d:'2026-09-04',t:'11:45',type:'Expense',desc:'Snacks',cat:'Food',pay:'UPI',amt:150},
-{d:'2026-09-02',t:'20:10',type:'Expense',desc:'Restaurant',cat:'Food',pay:'Card',amt:850},
-{d:'2026-09-01',t:'14:45',type:'Expense',desc:'Cafeteria',cat:'Food',pay:'Cash',amt:850},
-{d:'2026-09-01',t:'10:00',type:'Income',desc:'Freelance Work',cat:'Others',pay:'UPI',amt:5000}
-];
-let mode='expense';
-const money=n=>'₹'+Number(n).toLocaleString('en-IN');
-function rows(list){return list.map(x=>`<tr><td>${x.d}${x.t?'<br><span class="small">'+fmtTime(x.t)+'</span>':''}</td><td><span class="tag ${x.type==='Income'?'inc':'exp'}">${x.type}</span></td><td>${x.desc}</td><td>${x.cat}</td><td>${x.pay}</td><td class="amount ${x.type==='Income'?'green':'red'}">${x.type==='Income'?'+':'-'} ${money(x.amt)}</td></tr>`).join('')}
-function fmtTime(t){let [h,m]=t.split(':').map(Number), ap=h>=12?'PM':'AM';h=h%12||12;return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')} ${ap}`}
+'use strict';
+const KEY='expenseTrackerData';
+const CAT='expenseTrackerCategories';
+const PAY='expenseTrackerPayments';
+const PEOPLE='expenseTrackerPeople';
+const MONEY='expenseTrackerMoney';
+const VERSION='expenseTrackerAppVersion';
+const DEFAULT_CATS=['Food','Travel','Shopping','Bills','Entertainment','Health','Other'];
+const DEFAULT_PAYS=['Cash','UPI','Debit Card','Credit Card','Bank Transfer'];
+const $=id=>document.getElementById(id);
+const money=n=>'₹'+Number(n||0).toLocaleString('en-IN',{maximumFractionDigits:2});
+const today=()=>new Date().toISOString().slice(0,10);
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
 
-let people=['Rahul','Amit','Rohit'];
-let moneyTx=[
- {d:'2026-09-05',t:'19:00',person:'Rahul',type:'given',pay:'UPI',amt:2000,note:'Dinner / personal'},
- {d:'2026-09-08',t:'12:30',person:'Rahul',type:'received',pay:'Cash',amt:1000,note:'Partial repayment'},
- {d:'2026-09-03',t:'16:15',person:'Amit',type:'borrowed',pay:'UPI',amt:2500,note:'Borrowed for trip'}
-];
-function moneyTypeLabel(t){return ({given:'Maine Diya',borrowed:'Maine Liya',received:'Wapas Liya',returned:'Wapas Diya'})[t]||t}
-function moneySigned(t){return (t==='given'||t==='borrowed')?1:-1}
-function populatePeople(){
- const s=document.getElementById('personFilter'), m=document.getElementById('moneyPerson');
- s.innerHTML='<option value="All">All People</option>'+people.map(x=>`<option>${x}</option>`).join('');
- m.innerHTML=people.map(x=>`<option>${x}</option>`).join('');
+let state=load();
+
+function load(){
+  let data=read(KEY,[]);
+  let cats=read(CAT,DEFAULT_CATS);
+  let pays=read(PAY,DEFAULT_PAYS);
+  let people=read(PEOPLE,[]);
+  let loans=read(MONEY,[]);
+  if(!Array.isArray(data))data=[]; if(!Array.isArray(cats)||!cats.length)cats=[...DEFAULT_CATS];
+  if(!Array.isArray(pays)||!pays.length)pays=[...DEFAULT_PAYS];
+  if(!Array.isArray(people))people=[]; if(!Array.isArray(loans))loans=[];
+  if(!localStorage.getItem(VERSION))localStorage.setItem(VERSION,'7');
+  return {data,cats,pays,people,loans};
+}
+function read(k,f){try{const v=localStorage.getItem(k);return v===null?structuredClone(f):JSON.parse(v)}catch{return structuredClone(f)}}
+function save(){localStorage.setItem(KEY,JSON.stringify(state.data));localStorage.setItem(CAT,JSON.stringify(state.cats));localStorage.setItem(PAY,JSON.stringify(state.pays));localStorage.setItem(PEOPLE,JSON.stringify(state.people));localStorage.setItem(MONEY,JSON.stringify(state.loans));}
+function navItems(){return [['dashboard','Home'],['transactions','Transactions'],['money','Money'],['settings','Settings']]}
+function setupNav(){
+  const items=navItems();
+  $('sideNav').innerHTML=items.map(([id,t])=>`<button data-page="${id}">${t}</button>`).join('');
+  $('mobileNav').innerHTML=items.map(([id,t])=>`<button data-page="${id}">${t}</button>`).join('');
+  document.querySelectorAll('[data-page]').forEach(b=>b.onclick=()=>go(b.dataset.page));
+}
+function go(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===id));
+  document.querySelectorAll('[data-page]').forEach(b=>b.classList.toggle('active',b.dataset.page===id));
+  const title={dashboard:'Dashboard',transactions:'Transactions',money:'Money Given / Borrowed',settings:'Settings'}[id];
+  $('pageTitle').textContent=title;
+  render();
+}
+function render(){renderDashboard();renderTransactions();renderMoney();renderSettings()}
+function renderDashboard(){
+  let income=0,expense=0;
+  for(const x of state.data)x.type==='income'?income+=+x.amount:expense+=+x.amount;
+  $('mIncome').textContent=money(income);$('mExpense').textContent=money(expense);$('mBalance').textContent=money(income-expense);$('mCount').textContent=state.data.length;
+  const filter=$('categoryFilter').value;
+  const cats=[...new Set(state.data.filter(x=>x.type==='expense').map(x=>x.category).filter(Boolean))];
+  $('categoryFilter').innerHTML='<option value="">All categories</option>'+cats.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join('');
+  $('categoryFilter').value=filter;
+  const grouped={};
+  state.data.filter(x=>x.type==='expense'&&(!filter||x.category===filter)).forEach(x=>grouped[x.category]=(grouped[x.category]||0)+ +x.amount);
+  const entries=Object.entries(grouped).sort((a,b)=>b[1]-a[1]);
+  $('categorySummary').innerHTML=entries.length?entries.map(([c,v])=>`<div class="list-row"><span>${esc(c)}</span><b>${money(v)}</b></div>`).join(''):'<div class="empty">No expenses yet.</div>';
+  const recent=[...state.data].sort((a,b)=>(b.date||'').localeCompare(a.date||'')||(b.created||0)-(a.created||0)).slice(0,6);
+  $('recent').innerHTML=recent.length?recent.map(x=>`<div class="list-row"><div><b>${esc(x.category||x.type)}</b><div class="sub">${fmtDate(x.date)}${x.time?' · '+esc(x.time):''}</div></div><b class="${x.type==='income'?'green':'red'}">${x.type==='income'?'+':'−'}${money(x.amount)}</b></div>`).join(''):'<div class="empty">No transactions yet.</div>';
+}
+function renderTransactions(){
+  const d=$('txDate').value;
+  const arr=state.data.filter(x=>!d||x.date===d).sort((a,b)=>(b.date||'').localeCompare(a.date||'')||(b.created||0)-(a.created||0));
+  $('txBody').innerHTML=arr.length?arr.map(x=>`<tr><td>${fmtDate(x.date)}${x.time?'<br><span class="sub">'+esc(x.time)+'</span>':''}</td><td><span class="pill">${x.type==='income'?'Income':'Expense'}</span></td><td>${esc(x.category||'—')}</td><td class="${x.type==='income'?'green':'red'}"><b>${money(x.amount)}</b></td><td>${esc(x.payment||'—')}</td><td><button class="btn small danger" onclick="deleteTx('${x.id}')">Delete</button></td></tr>`).join(''):`<tr><td colspan="6" class="empty">No transactions found.</td></tr>`;
 }
 function renderMoney(){
- populatePeople();
- const selected=document.getElementById('personFilter').value||'All';
- let list=selected==='All'?moneyTx:moneyTx.filter(x=>x.person===selected);
- const given=moneyTx.filter(x=>x.type==='given').reduce((a,b)=>a+b.amt,0);
- const received=moneyTx.filter(x=>x.type==='received').reduce((a,b)=>a+b.amt,0);
- const borrowed=moneyTx.filter(x=>x.type==='borrowed').reduce((a,b)=>a+b.amt,0);
- const returned=moneyTx.filter(x=>x.type==='returned').reduce((a,b)=>a+b.amt,0);
- document.getElementById('givenTotal').textContent=money(given);
- document.getElementById('receiveTotal').textContent=money(Math.max(0,given-received));
- document.getElementById('receivedBackTotal').textContent=money(received);
- document.getElementById('borrowedTotal').textContent=money(Math.max(0,borrowed-returned));
- document.getElementById('moneyTable').innerHTML=list.sort((a,b)=>(b.d+b.t).localeCompare(a.d+a.t)).map(x=>`<tr><td>${x.d}${x.t?'<br><span class="small">'+fmtTime(x.t)+'</span>':''}</td><td><b>${x.person}</b></td><td><span class="tag ${x.type==='given'||x.type==='borrowed'?'exp':'inc'}">${moneyTypeLabel(x.type)}</span></td><td>${x.pay}</td><td>${x.note||'-'}</td><td class="amount ${x.type==='given'||x.type==='borrowed'?'red':'green'}">${money(x.amt)}</td></tr>`).join('')||'<tr><td colspan="6" class="small">No records found.</td></tr>';
- let summaryList=selected==='All'?[]:moneyTx.filter(x=>x.person===selected);
- if(selected!=='All'){
-   const g=summaryList.filter(x=>x.type==='given').reduce((a,b)=>a+b.amt,0);
-   const r=summaryList.filter(x=>x.type==='received').reduce((a,b)=>a+b.amt,0);
-   const b=summaryList.filter(x=>x.type==='borrowed').reduce((a,b)=>a+b.amt,0);
-   const ret=summaryList.filter(x=>x.type==='returned').reduce((a,b)=>a+b.amt,0);
-   document.getElementById('personSummary').innerHTML=`<div class="detail"><div class="detailhead"><div><h3>${selected}</h3><div class="small">Current outstanding</div><div class="big">${money(Math.max(0,g-r))}</div><div class="small">Mujhe ${g-r>=0?'lena':'dena'} hai</div></div><div style="text-align:right"><div class="small">Borrowed balance</div><b style="font-size:20px">${money(Math.max(0,b-ret))}</b></div></div></div>`;
- }else document.getElementById('personSummary').innerHTML='<div class="detail small">Select a person to see their complete given/borrowed balance.</div>';
- document.getElementById('peopleList').innerHTML=people.map(person=>{
-   const a=moneyTx.filter(x=>x.person===person), g=a.filter(x=>x.type==='given').reduce((s,x)=>s+x.amt,0), r=a.filter(x=>x.type==='received').reduce((s,x)=>s+x.amt,0), b=a.filter(x=>x.type==='borrowed').reduce((s,x)=>s+x.amt,0), ret=a.filter(x=>x.type==='returned').reduce((s,x)=>s+x.amt,0);
-   return `<div class="listrow"><span><b>${person}</b><br><span class="small">Lena: ${money(Math.max(0,g-r))} · Dena: ${money(Math.max(0,b-ret))}</span></span><span>${a.length} records</span></div>`;
- }).join('');
-}
-function addPerson(){
- const v=prompt('Enter person name');
- if(v&&v.trim()&&!people.includes(v.trim())){people.push(v.trim());renderMoney()}
-}
-function openMoneyModal(){
- if(!people.length){addPerson();if(!people.length)return}
- document.getElementById('moneyPerson').innerHTML=people.map(x=>`<option>${x}</option>`).join('');
- document.getElementById('moneyPay').innerHTML=pays.map(x=>`<option>${x}</option>`).join('');
- document.getElementById('moneyModal').classList.add('show');
-}
-function closeMoneyModal(){document.getElementById('moneyModal').classList.remove('show')}
-function saveMoney(){
- const person=document.getElementById('moneyPerson').value, type=document.getElementById('moneyType').value, amt=Number(document.getElementById('moneyAmount').value), d=document.getElementById('moneyDate').value;
- if(!person||!amt||!d){alert('Person, amount and date are required.');return}
- moneyTx.unshift({person,type,amt,d,t:document.getElementById('moneyTime').value,pay:document.getElementById('moneyPay').value,note:document.getElementById('moneyNote').value.trim()});
- closeMoneyModal(); document.getElementById('moneyAmount').value=''; document.getElementById('moneyNote').value=''; document.getElementById('moneyTime').value=''; renderMoney(); alert('Money record saved!');
-}
-function render(list=tx){document.getElementById('recent').innerHTML=rows(list.slice(0,8));document.getElementById('all').innerHTML=rows(list);document.getElementById('countCard').textContent=list.length}
-function populateFormOptions(){
-  const cat=document.getElementById('formCat'), pay=document.getElementById('formPay');
-  cat.innerHTML=cats.map(x=>`<option value="${x}">${x}</option>`).join('')+`<option value="__new__">＋ Add New Category...</option>`;
-  pay.innerHTML=pays.map(x=>`<option value="${x}">${x}</option>`).join('')+`<option value="__new__">＋ Add New Payment Mode...</option>`;
-}
-function handleNewSelect(el,type){
-  if(el.value!=='__new__') return;
-  const label=type==='category'?'Enter new category':'Enter new payment mode';
-  const value=prompt(label);
-  if(value && value.trim()){
-    const v=value.trim();
-    if(type==='category'){
-      if(!cats.includes(v)) cats.push(v);
-      populateFormOptions(); el.value=v;
-      renderLists(); updateSpendingCategoryOptions();
-    }else{
-      if(!pays.includes(v)) pays.push(v);
-      populateFormOptions(); el.value=v;
-      renderLists();
-    }
-  }else{
-    el.selectedIndex=0;
+  const sums={};
+  for(const p of state.people)sums[p.id]={name:p.name,given:0,take:0};
+  for(const x of state.loans){
+    if(!sums[x.person])sums[x.person]={name:'Unknown',given:0,take:0};
+    if(x.type==='given')sums[x.person].given+=+x.amount;
+    if(x.type==='received')sums[x.person].take+=+x.amount;
   }
+  const vals=Object.values(sums);
+  $('peopleSummary').innerHTML=vals.length?vals.map(x=>`<div class="list-row"><div><b>${esc(x.name)}</b><div class="sub">Net receivable ${money(x.given-x.take)}</div></div><b>${money(x.given-x.take)}</b></div>`).join(''):'<div class="empty">No people added yet.</div>';
+  const arr=[...state.loans].sort((a,b)=>(b.date||'').localeCompare(a.date||'')||(b.created||0)-(a.created||0));
+  $('moneyBody').innerHTML=arr.length?arr.map(x=>`<div class="list-row"><div><b>${esc(personName(x.person))}</b><div class="sub">${fmtDate(x.date)}${x.time?' · '+esc(x.time):''} · ${esc(x.payment||'—')}</div><div class="sub">${esc(x.note||'')}</div></div><div style="text-align:right"><b class="${x.type==='given'?'money-given':'money-receive'}">${x.type==='given'?'Given':'Received'}<br>${money(x.amount)}</b><br><button class="btn small danger" onclick="deleteMoney('${x.id}')">Delete</button></div></div>`).join(''):'<div class="empty">No money records yet.</div>';
 }
-function updateSpendingCategoryOptions(selected='Food'){
-  const s=document.getElementById('spendingCategory');
-  if(!s) return;
-  const expenseCats=[...new Set(tx.filter(x=>x.type==='Expense').map(x=>x.cat))];
-  const all=[...new Set([...cats,...expenseCats])];
-  s.innerHTML=all.map(x=>`<option value="${x}">${x}</option>`).join('');
-  if(all.includes(selected)) s.value=selected;
+function renderSettings(){
+  $('categoryList').innerHTML=state.cats.map((x,i)=>`<div class="list-row"><span>${esc(x)}</span><button class="btn small danger" onclick="removeCat(${i})">Remove</button></div>`).join('');
+  $('paymentList').innerHTML=state.pays.map((x,i)=>`<div class="list-row"><span>${esc(x)}</span><button class="btn small danger" onclick="removePay(${i})">Remove</button></div>`).join('');
 }
-function showCategory(cat){
-  updateSpendingCategoryOptions(cat);
-  let list=tx.filter(x=>x.type==='Expense'&&x.cat===cat);
-  list.sort((a,b)=>(b.d+b.t).localeCompare(a.d+a.t));
-  let total=list.reduce((a,b)=>a+b.amt,0);
-  const box=document.getElementById('spendingCategoryDetails');
-  if(!box) return;
-  box.innerHTML=`<div class="detail"><div class="detailhead"><div><h3>${cat} Expenses</h3><div class="small">Date-wise expense for selected category</div><div class="big">${money(total)}</div></div><div><div class="small">Transactions</div><b style="font-size:22px">${list.length}</b></div></div>
-  <table class="cat-date-table"><thead><tr><th>Date & Time</th><th>Description</th><th>Payment Mode</th><th style="text-align:right">Expense</th></tr></thead><tbody>
-  ${list.length?list.map(x=>`<tr><td>${x.d}${x.t?'<br><span class="small">'+fmtTime(x.t)+'</span>':''}</td><td>${x.desc}</td><td>${x.pay}</td><td class="amount red">- ${money(x.amt)}</td></tr>`).join(''):`<tr><td colspan="4" class="small">No expenses in this category.</td></tr>`}
-  </tbody></table></div>`;
+function personName(id){const p=state.people.find(p=>p.id===id);return p?p.name:'Unknown'}
+function fmtDate(d){if(!d)return '—';const [y,m,day]=d.split('-');return `${day}-${m}-${y}`}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function openModal(title,html){$('modalTitle').textContent=title;$('modalContent').innerHTML=html;$('modal').classList.add('show')}
+function closeModal(){$('modal').classList.remove('show')}
+function txForm(type){
+  const cats=state.cats.map(x=>`<option>${esc(x)}</option>`).join('');
+  const pays=state.pays.map(x=>`<option>${esc(x)}</option>`).join('');
+  openModal(type==='expense'?'Add Expense':'Add Income',`<form id="txForm">
+  <div class="row"><label>Date<input id="fDate" type="date" value="${today()}" required></label><label>Time (optional)<input id="fTime" type="time"></label></div>
+  <div class="row"><label>Amount<input id="fAmount" type="number" min="0" step="0.01" inputmode="decimal" required placeholder="0.00"></label><label>Category<select id="fCat">${cats}</select></label></div>
+  <label>Payment Mode<select id="fPay">${pays}</select></label><label>Note (optional)<textarea id="fNote" placeholder="Add a note"></textarea></label>
+  <div class="actions"><button type="button" class="btn" id="cancel">Cancel</button><button class="btn primary">Save</button></div></form>`);
+  $('cancel').onclick=closeModal;
+  $('txForm').onsubmit=e=>{e.preventDefault();const amount=Number($('fAmount').value);if(!(amount>0))return alert('Enter a valid amount.');state.data.push({id:uid(),type,amount,date:$('fDate').value,time:$('fTime').value,category:$('fCat').value,payment:$('fPay').value,note:$('fNote').value,created:Date.now()});save();closeModal();render()}
 }
-function applyFilter(){let f=document.getElementById('from').value,to=document.getElementById('to').value,c=document.getElementById('catFilter').value,p=document.getElementById('payFilter').value;let list=tx.filter(x=>(!f||x.d>=f)&&(!to||x.d<=to)&&(c==='All'||x.cat===c)&&(p==='All'||x.pay===p));render(list);if(c!=='All'){document.getElementById('catDetail').value=c;showCategory(c)}}
-function resetFilter(){document.getElementById('from').value='2026-09-01';document.getElementById('to').value='2026-09-09';document.getElementById('catFilter').value='All';document.getElementById('payFilter').value='All';render(tx);showCategory('Food')}
-function openModal(m){mode=m;document.getElementById('modalTitle').textContent=m==='expense'?'Add Expense':'Add Income';populateFormOptions();document.getElementById('modal').classList.add('show')}
-function closeModal(){document.getElementById('modal').classList.remove('show')}
-function saveTxn(){let a=Number(document.getElementById('amount').value),d=document.getElementById('date').value,desc=document.getElementById('desc').value.trim();if(!a||!d||!desc){alert('Amount, date and description are required.');return}tx.unshift({d,t:document.getElementById('time').value,type:mode==='expense'?'Expense':'Income',desc,cat:document.getElementById('formCat').value,pay:document.getElementById('formPay').value,amt:a});render(tx);closeModal();document.getElementById('amount').value='';document.getElementById('desc').value='';document.getElementById('time').value='';alert('Saved successfully!')}
-function addCat(){let v=document.getElementById('newCat').value.trim();if(v&&!cats.includes(v)){cats.push(v);document.getElementById('newCat').value='';renderLists();populateFormOptions();updateSpendingCategoryOptions(v)}}
-function addPay(){let v=document.getElementById('newPay').value.trim();if(v&&!pays.includes(v)){pays.push(v);document.getElementById('newPay').value='';renderLists();populateFormOptions()}}
-function renderLists(){document.getElementById('catList').innerHTML=cats.map(x=>`<div class="listrow">🏷️ ${x}<span>🗑️</span></div>`).join('');document.getElementById('payList').innerHTML=pays.map(x=>`<div class="listrow">💳 ${x}<span>🗑️</span></div>`).join('')}
-function goPage(page){
- document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
- const target=document.getElementById(page); if(target) target.classList.add('active');
- document.querySelectorAll('.nav button,.mobile-nav button').forEach(x=>x.classList.toggle('active',x.dataset.page===page));
- const btn=document.querySelector(`.nav button[data-page="${page}"]`)||document.querySelector(`.mobile-nav button[data-page="${page}"]`);
- if(btn) document.getElementById('pageTitle').textContent=btn.textContent.replace(/[^\w\s]/g,'').trim();
- window.scrollTo({top:0,behavior:'smooth'});
+function moneyForm(){
+  if(!state.people.length){alert('First add a person.');personForm();return}
+  const people=state.people.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join('');
+  const pays=state.pays.map(x=>`<option>${esc(x)}</option>`).join('');
+  openModal('Add Money Record',`<form id="moneyForm">
+  <div class="row"><label>Person<select id="mPerson">${people}</select></label><label>Type<select id="mType"><option value="given">Maine Diya</option><option value="received">Maine Wapas Liya</option></select></label></div>
+  <div class="row"><label>Amount<input id="mAmount" type="number" min="0" step="0.01" inputmode="decimal" required></label><label>Date<input id="mDate" type="date" value="${today()}" required></label></div>
+  <div class="row"><label>Time (optional)<input id="mTime" type="time"></label><label>Payment Mode<select id="mPay">${pays}</select></label></div>
+  <label>Note (optional)<textarea id="mNote"></textarea></label>
+  <div class="actions"><button type="button" class="btn" id="cancel">Cancel</button><button class="btn primary">Save</button></div></form>`);
+  $('cancel').onclick=closeModal;
+  $('moneyForm').onsubmit=e=>{e.preventDefault();const amount=Number($('mAmount').value);if(!(amount>0))return alert('Enter a valid amount.');state.loans.push({id:uid(),person:$('mPerson').value,type:$('mType').value,amount,date:$('mDate').value,time:$('mTime').value,payment:$('mPay').value,note:$('mNote').value,created:Date.now()});save();closeModal();render()}
 }
-document.querySelectorAll('.nav button,.mobile-nav button').forEach(b=>b.onclick=()=>goPage(b.dataset.page));
-render(tx);renderLists();populateFormOptions();updateSpendingCategoryOptions('Food');showCategory('Food');renderMoney();
+function personForm(){
+  openModal('Add Person',`<form id="personForm"><label>Person Name<input id="pName" required placeholder="Enter name"></label><div class="actions"><button type="button" class="btn" id="cancel">Cancel</button><button class="btn primary">Add Person</button></div></form>`);
+  $('cancel').onclick=closeModal;$('personForm').onsubmit=e=>{e.preventDefault();const name=$('pName').value.trim();if(!name)return;state.people.push({id:uid(),name});save();closeModal();render()}
+}
+function deleteTx(id){if(confirm('Delete this transaction?')){state.data=state.data.filter(x=>x.id!==id);save();render()}}
+function deleteMoney(id){if(confirm('Delete this money record?')){state.loans=state.loans.filter(x=>x.id!==id);save();render()}}
+function removeCat(i){if(confirm('Remove this category? Existing transactions will remain unchanged.')){state.cats.splice(i,1);if(!state.cats.length)state.cats.push('Other');save();render()}}
+function removePay(i){if(confirm('Remove this payment mode? Existing transactions will remain unchanged.')){state.pays.splice(i,1);if(!state.pays.length)state.pays.push('Cash');save();render()}}
+$('quickAdd').onclick=()=>txForm('expense');$('addExpense').onclick=()=>txForm('expense');$('addIncome').onclick=()=>txForm('income');$('addMoney').onclick=moneyForm;$('addPerson').onclick=personForm;
+$('closeModal').onclick=closeModal;$('modal').onclick=e=>{if(e.target===$('modal'))closeModal()};
+$('categoryFilter').onchange=renderDashboard;$('txDate').onchange=renderTransactions;$('clearTxDate').onclick=()=>{$('txDate').value='';renderTransactions()};
+$('saveCategory').onclick=()=>{const x=$('newCategory').value.trim();if(x&&!state.cats.includes(x)){state.cats.push(x);$('newCategory').value='';save();render()}};
+$('savePayment').onclick=()=>{const x=$('newPayment').value.trim();if(x&&!state.pays.includes(x)){state.pays.push(x);$('newPayment').value='';save();render()}};
+$('exportData').onclick=()=>{const payload={version:1,exportedAt:new Date().toISOString(),data:state.data,categories:state.cats,payments:state.pays,people:state.people,money:state.loans};const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}));a.download='expense-tracker-backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)};
+$('importBtn').onclick=()=>$('importFile').click();
+$('importFile').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const x=JSON.parse(await f.text());if(!Array.isArray(x.data))throw Error();state.data=x.data;state.cats=Array.isArray(x.categories)&&x.categories.length?x.categories:DEFAULT_CATS;state.pays=Array.isArray(x.payments)&&x.payments.length?x.payments:DEFAULT_PAYS;state.people=Array.isArray(x.people)?x.people:[];state.loans=Array.isArray(x.money)?x.money:[];save();render();alert('Backup imported successfully.')}catch{alert('Invalid backup file.')}e.target.value=''};
+$('clearData').onclick=()=>{if(confirm('This will permanently delete all local transactions, people and money records. Continue?')){state={data:[],cats:[...DEFAULT_CATS],pays:[...DEFAULT_PAYS],people:[],loans:[]};save();render()}};
+setupNav();render();
 </script>
-
-<div class="mobile-nav" id="mobileNav">
- <button class="active" data-page="dashboard">🏠<br>Home</button>
- <button data-page="transactions">📋<br>Transactions</button>
- <button data-page="money">🤝<br>Money</button>
- <button data-page="settings">⚙️<br>Settings</button>
-</div>
-</body></html>
+</body>
+</html>

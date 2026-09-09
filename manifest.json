@@ -1,9 +1,9 @@
 {
   "name": "Expense Tracker",
   "short_name": "Expenses",
-  "start_url": "./",
+  "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#f4f7f5",
-  "theme_color": "#0b9f5a",
-  "description": "Personal expense tracker"
+  "background_color": "#f6f7fb",
+  "theme_color": "#111827",
+  "icons": []
 }
